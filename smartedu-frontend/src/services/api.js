@@ -45,7 +45,7 @@ api.interceptors.response.use(
             const isAuthRoute = error.config.url?.includes('/auth/');
             if (!isAuthRoute) {
                 localStorage.removeItem('user');
-                window.location.href = '/login';
+                window.location.href = '#/login';
             }
         }
         return Promise.reject(error);
