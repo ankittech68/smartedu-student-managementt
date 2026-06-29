@@ -33,6 +33,11 @@ public class UserController {
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         
+        if (user.getStudentProfile() != null) {
+            user.getStudentProfile().setUsername(userDetails.getUsername());
+            user.getStudentProfile().setEmail(userDetails.getEmail());
+        }
+        
         userRepository.save(user);
 
         return ResponseEntity.ok(user);

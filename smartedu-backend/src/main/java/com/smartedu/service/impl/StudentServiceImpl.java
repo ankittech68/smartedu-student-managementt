@@ -22,14 +22,21 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student saveStudent(Student student) {
-        if (student.getUser() == null) {
-            if (student.getUserId() != null) {
-                userRepository.findById(student.getUserId()).ifPresent(student::setUser);
-            } else if (student.getEmail() != null) {
-                userRepository.findByEmail(student.getEmail()).ifPresent(student::setUser);
-            } else if (student.getUsername() != null) {
-                userRepository.findByUsername(student.getUsername()).ifPresent(student::setUser);
-            }
+        User user = null;
+        if (student.getUser() != null && student.getUser().getId() != null) {
+            user = userRepository.findById(student.getUser().getId()).orElse(null);
+        } else if (student.getUserId() != null) {
+            user = userRepository.findById(student.getUserId()).orElse(null);
+        } else if (student.getEmail() != null) {
+            user = userRepository.findByEmail(student.getEmail()).orElse(null);
+        } else if (student.getUsername() != null) {
+            user = userRepository.findByUsername(student.getUsername()).orElse(null);
+        }
+
+        if (user != null) {
+            student.setUser(user);
+            student.setEmail(user.getEmail());
+            student.setUsername(user.getUsername());
         }
         return studentRepository.save(student);
     }
@@ -65,6 +72,20 @@ public class StudentServiceImpl implements StudentService {
             Student student = studentOpt.get();
             student.setUser(user);
             studentRepository.save(student);
+        }
+
+        // Auto-create default Student profile if missing and role is STUDENT
+        if (studentOpt.isEmpty() && user.getRole() == com.smartedu.model.Role.STUDENT) {
+            Student student = Student.builder()
+                    .firstName(user.getUsername())
+                    .lastName("Student")
+                    .enrollmentDate(java.time.LocalDate.now())
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .user(user)
+                    .build();
+            student = studentRepository.save(student);
+            return student;
         }
 
         return studentOpt.orElseThrow(() -> new RuntimeException("Student profile not found for user id: " + userId));

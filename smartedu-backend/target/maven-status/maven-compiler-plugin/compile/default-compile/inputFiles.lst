@@ -1,39 +1,39 @@
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\services\UserDetailsServiceImpl.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\MarksService.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\request\LoginRequest.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\response\JwtResponse.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Marks.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Notification.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\impl\MarksServiceImpl.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\NotificationController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\UserRepository.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\AttendanceStatus.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\StudentService.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Student.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\impl\AttendanceServiceImpl.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\jwt\AuthTokenFilter.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\ApprovalController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\config\DataMigrationRunner.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\UserController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\MarksController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\SmarteduBackendApplication.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\AttendanceRepository.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\AttendanceController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\RecordStatus.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\services\UserDetailsImpl.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\NotificationService.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\StudentController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\WebSecurityConfig.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\jwt\AuthEntryPointJwt.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\jwt\JwtUtils.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\request\SignupRequest.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Role.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\AttendanceService.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\NotificationRepository.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Attendance.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\User.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\impl\StudentServiceImpl.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\response\MessageResponse.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\StudentRepository.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\AuthController.java
-C:\Users\Ankit\Desktop\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\MarksRepository.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\MarksController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\NotificationController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\ApprovalController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\response\MessageResponse.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Role.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\UserRepository.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\SmarteduBackendApplication.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\impl\MarksServiceImpl.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\StudentService.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\MarksRepository.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\StudentController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\impl\AttendanceServiceImpl.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\request\LoginRequest.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\AttendanceRepository.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Student.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\UserController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\RecordStatus.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\AttendanceController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\services\UserDetailsServiceImpl.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\NotificationRepository.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\AttendanceService.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\jwt\AuthEntryPointJwt.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\config\DataMigrationRunner.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\services\UserDetailsImpl.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Notification.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\request\SignupRequest.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\jwt\JwtUtils.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\dto\response\JwtResponse.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\jwt\AuthTokenFilter.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\MarksService.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\NotificationService.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\AttendanceStatus.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\User.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\repository\StudentRepository.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\service\impl\StudentServiceImpl.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\controller\AuthController.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\security\WebSecurityConfig.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Attendance.java
+C:\Users\Ankit\Desktop\Major Projects\Student Management Portal\smartedu-backend\src\main\java\com\smartedu\model\Marks.java

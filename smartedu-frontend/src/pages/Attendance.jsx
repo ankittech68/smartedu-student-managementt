@@ -174,7 +174,7 @@ const Attendance = () => {
                     <tbody className="divide-y divide-gray-100">
                         {attendance.length === 0 ? (
                             <tr>
-                                <td colSpan={user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER' ? "4" : "3"} className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan={user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER' ? "5" : "3"} className="px-6 py-8 text-center text-gray-500">
                                     No attendance records found.
                                 </td>
                             </tr>

@@ -1,19 +1,25 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LogIn, User } from 'lucide-react';
+import { LogIn, User, Loader2 } from 'lucide-react';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = await login(username, password);
-        if (success) {
-            navigate('/dashboard');
+        setIsLoading(true);
+        try {
+            const success = await login(username, password);
+            if (success) {
+                navigate('/dashboard');
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -36,7 +42,8 @@ const Login = () => {
                             required
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition duration-150"
+                            disabled={isLoading}
+                            className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition duration-150 disabled:opacity-50"
                             placeholder="Enter your username"
                         />
                     </div>
@@ -48,17 +55,28 @@ const Login = () => {
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition duration-150"
+                            disabled={isLoading}
+                            className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition duration-150 disabled:opacity-50"
                             placeholder="••••••••"
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150"
+                        disabled={isLoading}
+                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <LogIn className="w-5 h-5 mr-2" />
-                        Sign In
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                Signing In...
+                            </>
+                        ) : (
+                            <>
+                                <LogIn className="w-5 h-5 mr-2" />
+                                Sign In
+                            </>
+                        )}
                     </button>
                 </form>
 

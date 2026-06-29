@@ -29,6 +29,7 @@ public class Notification {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean isRead = false;
 

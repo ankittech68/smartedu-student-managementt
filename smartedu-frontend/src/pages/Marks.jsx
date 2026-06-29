@@ -202,7 +202,7 @@ const Marks = () => {
                     <tbody className="divide-y divide-gray-100">
                         {marks.length === 0 ? (
                             <tr>
-                                <td colSpan={user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER' ? "5" : "4"} className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan={user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER' ? "6" : "4"} className="px-6 py-8 text-center text-gray-500">
                                     No marks found.
                                 </td>
                             </tr>

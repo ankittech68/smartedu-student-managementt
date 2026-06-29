@@ -9,9 +9,14 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        try {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                setUser(JSON.parse(storedUser));
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored user data, clearing:', e);
+            localStorage.removeItem('user');
         }
         setLoading(false);
     }, []);
@@ -19,14 +24,20 @@ export const AuthProvider = ({ children }) => {
     const login = async (username, password) => {
         try {
             const response = await api.post('/auth/signin', { username, password });
-            if (response.data.token) {
+            if (response.data && response.data.token) {
                 localStorage.setItem('user', JSON.stringify(response.data));
                 setUser(response.data);
                 toast.success('Logged in successfully!');
                 return true;
             }
+            toast.error('Login failed: No token received from server.');
+            return false;
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed!');
+            console.error('Login error:', error);
+            const message = error.response?.data?.message 
+                || error.message 
+                || 'Login failed! Please try again.';
+            toast.error(message);
             return false;
         }
     };
@@ -37,7 +48,11 @@ export const AuthProvider = ({ children }) => {
             toast.success('Registration successful! Please login.');
             return true;
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Registration failed!');
+            console.error('Registration error:', error);
+            const message = error.response?.data?.message 
+                || error.message 
+                || 'Registration failed! Please try again.';
+            toast.error(message);
             return false;
         }
     };
