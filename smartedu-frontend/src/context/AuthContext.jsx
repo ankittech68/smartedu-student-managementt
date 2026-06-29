@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const response = await api.post('/auth/signin', { username, password });
+            const response = await api.post(`${import.meta.env.VITE_API_URL}/auth/signin`, { username, password });
             if (response.data && response.data.token) {
                 localStorage.setItem('user', JSON.stringify(response.data));
                 setUser(response.data);
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (username, email, password, role) => {
         try {
-            await api.post('/auth/signup', { username, email, password, role });
+            await api.post(`${import.meta.env.VITE_API_URL}/auth/signup`, { username, email, password, role });
             toast.success('Registration successful! Please login.');
             return true;
         } catch (error) {
