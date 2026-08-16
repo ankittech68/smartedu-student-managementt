@@ -1,294 +1,43 @@
-# SmartEdu - Student Management Portal
+# 🎨 SmartEdu - Frontend Client
 
-## Overview
-
-SmartEdu is a full-stack Student Management Portal designed to streamline academic administration and improve communication between students, teachers, and administrators.
-
-The platform enables secure authentication, student record management, attendance tracking, marks management, notifications, and role-based access control through an intuitive web interface.
-
-## Features
-
-### Authentication & Security
-
-* JWT-based Authentication
-* Role-Based Authorization
-* Secure Password Encryption using BCrypt
-* Protected Routes
-
-### Student Module
-
-* Student Dashboard
-* View Attendance Records
-* View Academic Marks
-* Profile Management
-* Notification Center
-
-### Teacher Module
-
-* Manage Student Attendance
-* Upload Marks
-* View Student Information
-* Academic Tracking
-
-### Admin Module
-
-* User Management
-* Student Management
-* Teacher Management
-* System Monitoring
-* Notification Management
-
-### Notifications
-
-* Real-time Academic Notifications
-* Registration Alerts
-* System Announcements
+This is the client-side single-page application (SPA) for the **SmartEdu Student Management Portal**, built with **React 19**, **Vite**, and **TailwindCSS**.
 
 ---
 
-# Technology Stack
+## 🚀 Features
 
-## Frontend
-
-* React.js
-* Vite
-* React Router
-* Axios
-* Tailwind CSS
-
-## Backend
-
-* Java
-* Spring Boot
-* Spring Security
-* JWT Authentication
-* Spring Data JPA
-* Hibernate
-
-## Database
-
-* PostgreSQL (Production)
-* MySQL (Development)
-
-## Deployment
-
-* Frontend: Vercel
-* Backend: Render
-* Database: Render PostgreSQL
+- **Interactive Role Dashboards**: Real-time stats and Chart.js visualizations for Attendance and Subject Performance.
+- **Role-Based Access Control (RBAC)**: Custom UI flows for `ADMIN`, `TEACHER`, and `STUDENT`.
+- **Student Management**: Table view with linked user account status, search filtering, and record editing.
+- **Attendance Tracking**: Visual 3-button status selector and CSV log export.
+- **Marks & Marksheets**: Auto-grade calculation, inline progress bars, and printable official marksheets.
+- **Bulk Approvals**: Single-click bulk approval & clear functionality for Administrators.
+- **Notification Dropdown**: Unread badge counter with single-click "Read All" action.
+- **Dark Mode UI**: Professional glassmorphic surfaces, dark sidebar, and Google Fonts (`Inter` / `Plus Jakarta Sans`).
 
 ---
 
-# Architecture
+## 🛠️ Technology Stack
 
-```text
-                    ┌─────────────────┐
-                    │     Client      │
-                    │ React + Vite UI │
-                    └────────┬────────┘
-                             │
-                             │ HTTPS
-                             ▼
-                    ┌─────────────────┐
-                    │ Spring Boot API │
-                    │ Authentication  │
-                    │ Business Logic  │
-                    └────────┬────────┘
-                             │
-                             │ JPA/Hibernate
-                             ▼
-                    ┌─────────────────┐
-                    │ PostgreSQL DB   │
-                    │ Student Records │
-                    │ Attendance      │
-                    │ Marks           │
-                    │ Notifications   │
-                    └─────────────────┘
-```
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Routing**: React Router DOM v7
+- **HTTP Client**: Axios
+- **Styling**: TailwindCSS v4 + Custom Design Tokens (`index.css`)
+- **Icons**: Lucide React
+- **Charts**: Chart.js & react-chartjs-2
+- **Toasts**: React Hot Toast
 
 ---
 
-# Project Structure
-
-```text
-smartedu-student-management/
-
-├── smartedu-frontend/
-│   ├── src/
-│   ├── public/
-│   ├── components/
-│   ├── pages/
-│   ├── context/
-│   ├── services/
-│   └── assets/
-│
-├── smartedu-backend/
-│   ├── controller/
-│   ├── service/
-│   ├── repository/
-│   ├── model/
-│   ├── dto/
-│   ├── security/
-│   └── config/
-│
-└── README.md
-```
-
----
-
-# How to Run Locally
-
-## Frontend Setup
+## ⚙️ Local Development Setup
 
 ```bash
-cd smartedu-frontend
+# 1. Install dependencies
 npm install
+
+# 2. Start Vite development server
 npm run dev
 ```
 
-Frontend runs at:
-
-```text
-http://localhost:5173
-```
-
----
-
-## Backend Setup
-
-```bash
-cd smartedu-backend
-mvn clean install
-mvn spring-boot:run
-```
-
-Backend runs at:
-
-```text
-http://localhost:9999
-```
-
----
-
-# Environment Variables
-
-## Frontend (.env)
-
-```env
-VITE_API_URL=https://smartedu-backend1.onrender.com/api
-```
-
-## Backend
-
-```env
-SPRING_DATASOURCE_URL=<postgres-url>
-SPRING_DATASOURCE_USERNAME=<username>
-SPRING_DATASOURCE_PASSWORD=<password>
-
-JWT_SECRET=<secret-key>
-JWT_EXPIRATION_MS=86400000
-```
-
----
-
-# API Endpoints
-
-## Authentication
-
-```http
-POST /api/auth/signup
-POST /api/auth/signin
-```
-
-## Students
-
-```http
-GET /api/students
-POST /api/students
-PUT /api/students/{id}
-DELETE /api/students/{id}
-```
-
-## Attendance
-
-```http
-GET /api/attendance
-POST /api/attendance
-```
-
-## Marks
-
-```http
-GET /api/marks
-POST /api/marks
-```
-
----
-
-# Key Design Decisions
-
-### JWT Authentication
-
-Implemented stateless authentication for scalability and security.
-
-### Role-Based Access Control
-
-Separate dashboards and permissions for Admin, Teacher, and Student users.
-
-### PostgreSQL Deployment
-
-Production database migrated to PostgreSQL for cloud deployment compatibility.
-
-### RESTful Architecture
-
-Backend designed using REST APIs for easy frontend-backend integration.
-
----
-
-# Trade-offs
-
-### Chosen
-
-* JWT Authentication
-* PostgreSQL Cloud Database
-* React Context API
-* Spring Security
-
-### Not Implemented
-
-* Redis Caching
-* WebSocket Notifications
-* File Storage Service
-* Microservices Architecture
-
-These were intentionally excluded to keep the project manageable while maintaining production-level functionality.
-
----
-
-# Future Enhancements
-
-* Real-Time Notifications
-* Student Performance Analytics
-* PDF Report Generation
-* Email Notifications
-* Mobile Application
-* AI-Based Academic Insights
-
----
-
-# Deployment Links
-
-Frontend:
-https://smartedu-student-management.vercel.app
-
-Backend:
-https://smartedu-backend1.onrender.com
-
----
-
-# Author
-
-Ankit
-
-B.Tech Computer Science & Engineering
-
-Lovely Professional University
+The application will run on `http://localhost:5173`.
