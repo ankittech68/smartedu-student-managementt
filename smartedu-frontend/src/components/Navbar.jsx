@@ -1,35 +1,74 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { LogOut, Menu } from 'lucide-react';
+import { LogOut, Menu, UserCheck, ShieldCheck, User, GraduationCap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = ({ toggleSidebar }) => {
     const { user, logout } = useContext(AuthContext);
+    const rawRole = (user?.role || '').toUpperCase().replace(/^ROLE_/, '');
+
+    const roleBadge = {
+        ADMIN:   { label: 'Admin',   cls: 'badge badge-indigo',  Icon: ShieldCheck },
+        TEACHER: { label: 'Faculty', cls: 'badge badge-purple',  Icon: UserCheck   },
+        STUDENT: { label: 'Student', cls: 'badge badge-emerald', Icon: User        },
+    }[rawRole] || { label: rawRole, cls: 'badge badge-slate', Icon: User };
+
+    const RoleIcon = roleBadge.Icon;
 
     return (
-        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 z-10 sticky top-0">
-            <div className="flex items-center">
+        <header className="glass-nav h-16 flex items-center justify-between px-4 lg:px-6 z-30 sticky top-0">
+            {/* Left: Hamburger + Greeting */}
+            <div className="flex items-center gap-3">
                 <button
                     onClick={toggleSidebar}
-                    className="p-2 mr-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg lg:hidden"
+                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl lg:hidden transition"
+                    aria-label="Toggle Sidebar"
                 >
-                    <Menu className="w-6 h-6" />
+                    <Menu className="w-5 h-5" />
                 </button>
-                <h1 className="text-xl font-bold text-gray-800 hidden sm:block">Welcome back, {user?.username}</h1>
+
+                {/* Mobile logo placeholder */}
+                <Link
+                    to="/dashboard"
+                    className="flex items-center space-x-2 lg:hidden"
+                >
+                    <div className="w-7 h-7 rounded-lg gradient-bg flex items-center justify-center">
+                        <GraduationCap className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-extrabold text-slate-900">Smart<span className="text-indigo-500">Edu</span></span>
+                </Link>
+
+                <div className="hidden sm:flex items-center gap-2.5">
+                    <span className="text-sm font-semibold text-slate-700">
+                        Hello, <span className="gradient-text font-extrabold">{user?.username}</span>
+                    </span>
+                    <span className={roleBadge.cls}>
+                        <RoleIcon className="w-3 h-3 mr-1" />
+                        {roleBadge.label}
+                    </span>
+                </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Right: Notifications + Avatar + Logout */}
+            <div className="flex items-center gap-2">
                 <NotificationDropdown />
 
-                <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold border border-primary-200 shadow-sm">
+                <div className="h-8 w-px bg-slate-200 mx-1" />
+
+                <div
+                    className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center text-white font-bold text-sm shadow-sm"
+                    title={user?.username}
+                >
                     {user?.username?.charAt(0).toUpperCase()}
                 </div>
-                
-                <button 
+
+                <button
                     onClick={logout}
-                    className="flex items-center text-sm font-medium text-gray-600 hover:text-red-600 transition-colors ml-4"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-xl transition border border-transparent hover:border-rose-100"
+                    title="Sign Out"
                 >
-                    <LogOut className="w-4 h-4 mr-1" />
+                    <LogOut className="w-4 h-4" />
                     <span className="hidden sm:inline">Logout</span>
                 </button>
             </div>

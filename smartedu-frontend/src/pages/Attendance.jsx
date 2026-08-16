@@ -2,291 +2,323 @@ import { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Calendar, CheckCircle, XCircle, Clock, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Calendar, CheckCircle, XCircle, Clock, Plus, Edit2, Trash2, X, Search, Download, Filter, CalendarCheck } from 'lucide-react';
+
+const statusBadge = (status) => {
+    if (status === 'PRESENT') return <span className="badge badge-emerald"><CheckCircle className="w-3 h-3 mr-1" />Present</span>;
+    if (status === 'ABSENT')  return <span className="badge badge-rose"><XCircle className="w-3 h-3 mr-1" />Absent</span>;
+    if (status === 'LATE')    return <span className="badge badge-amber"><Clock className="w-3 h-3 mr-1" />Late</span>;
+    return <span className="badge badge-slate">{status}</span>;
+};
+
+const approvalBadge = (s) => {
+    if (s === 'APPROVED') return <span className="badge badge-emerald">Approved</span>;
+    if (s === 'REJECTED') return <span className="badge badge-rose">Rejected</span>;
+    return <span className="badge badge-amber">Pending</span>;
+};
 
 const Attendance = () => {
     const [attendance, setAttendance] = useState([]);
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const { user } = useContext(AuthContext);
+    const rawRole = (user?.role || '').toUpperCase().replace(/^ROLE_/, '');
 
-    // Modal state
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('ALL');
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
-    const [formData, setFormData] = useState({
-        id: null,
-        studentId: '',
-        date: '',
-        status: 'PRESENT'
-    });
+    const [formData, setFormData] = useState({ id: null, studentId: '', date: '', status: 'PRESENT' });
 
     const fetchAttendance = async () => {
         try {
-            let response;
-            if (user?.role === 'ROLE_STUDENT') {
+            let res;
+            if (rawRole === 'STUDENT') {
                 try {
-                    const studentProfile = await api.get(`/students/me`);
-                    response = await api.get(`/attendance/student/${studentProfile.data.id}`);
-                } catch (e) {
-                    setAttendance([]);
-                    setLoading(false);
-                    return;
-                }
+                    const me = await api.get('/students/me');
+                    res = await api.get(`/attendance/student/${me.data.id}`);
+                } catch { setAttendance([]); setLoading(false); return; }
             } else {
-                response = await api.get('/attendance');
+                res = await api.get('/attendance');
             }
-            setAttendance(response?.data || []);
-            setLoading(false);
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to fetch attendance records');
-            setLoading(false);
-        }
+            setAttendance(res?.data || []);
+        } catch { toast.error('Failed to fetch attendance'); }
+        finally { setLoading(false); }
     };
 
     const fetchStudents = async () => {
-        try {
-            const response = await api.get('/students');
-            setStudents(response.data);
-        } catch (error) {
-            console.error('Failed to load students for dropdown', error);
-        }
+        try { const res = await api.get('/students'); setStudents(res.data || []); }
+        catch { /* silent */ }
     };
 
     useEffect(() => {
         fetchAttendance();
-        if (user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER') {
-            fetchStudents();
-        }
-    }, [user]);
+        if (rawRole === 'ADMIN' || rawRole === 'TEACHER') fetchStudents();
+    }, [user, rawRole]);
 
     const openModal = (record = null) => {
         if (record) {
             setIsEdit(true);
-            setFormData({
-                id: record.id,
-                studentId: record.student?.id || '',
-                date: record.date || '',
-                status: record.status || 'PRESENT'
-            });
+            setFormData({ id: record.id, studentId: record.student?.id || record.studentId || '', date: record.date || '', status: record.status || 'PRESENT' });
         } else {
             setIsEdit(false);
-            setFormData({
-                id: null,
-                studentId: '',
-                date: new Date().toISOString().split('T')[0],
-                status: 'PRESENT'
-            });
+            setFormData({ id: null, studentId: students[0]?.id || '', date: new Date().toISOString().split('T')[0], status: 'PRESENT' });
         }
         setIsModalOpen(true);
     };
 
-    const closeModal = () => setIsModalOpen(false);
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.studentId) { toast.error('Please select a student'); return; }
         try {
-            const payload = {
-                date: formData.date,
-                status: formData.status,
-                student: { id: formData.studentId }
-            };
-
+            const payload = { date: formData.date, status: formData.status, student: { id: formData.studentId } };
             if (isEdit) {
                 await api.put(`/attendance/${formData.id}`, payload);
-                toast.success('Attendance updated successfully');
+                toast.success('Attendance updated');
             } else {
                 await api.post('/attendance', payload);
-                toast.success('Attendance marked successfully');
+                toast.success('Attendance recorded');
             }
             fetchAttendance();
-            closeModal();
+            setIsModalOpen(false);
         } catch (error) {
-            console.error(error);
-            toast.error(isEdit ? 'Failed to update attendance' : 'Failed to mark attendance');
+            toast.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this attendance record?')) {
-            try {
-                await api.delete(`/attendance/${id}`);
-                toast.success('Attendance deleted successfully');
-                fetchAttendance();
-            } catch (error) {
-                console.error(error);
-                toast.error('Failed to delete attendance');
-            }
-        }
+        if (!window.confirm('Delete this attendance record?')) return;
+        try { await api.delete(`/attendance/${id}`); toast.success('Record deleted'); fetchAttendance(); }
+        catch { toast.error('Failed to delete'); }
     };
 
-    const getStatusBadge = (status) => {
-        switch (status) {
-            case 'PRESENT':
-                return <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold flex items-center w-fit"><CheckCircle className="w-3 h-3 mr-1"/> Present</span>;
-            case 'ABSENT':
-                return <span className="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold flex items-center w-fit"><XCircle className="w-3 h-3 mr-1"/> Absent</span>;
-            case 'LATE':
-                return <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-bold flex items-center w-fit"><Clock className="w-3 h-3 mr-1"/> Late</span>;
-            default:
-                return status;
-        }
+    const exportToCSV = () => {
+        if (filteredAttendance.length === 0) { toast.error('No records to export'); return; }
+        const headers = ['ID', 'Date', 'Student ID', 'Student Name', 'Status', 'Approval'];
+        const rows = filteredAttendance.map(a => {
+            const name = a.student ? `${a.student.firstName} ${a.student.lastName}` : `#${a.studentId}`;
+            return [a.id, a.date||'', a.student?.id||'', `"${name}"`, a.status||'', a.approvalStatus||'APPROVED'].join(',');
+        });
+        const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
+        const link = Object.assign(document.createElement('a'), {
+            href: URL.createObjectURL(blob),
+            download: `SmartEdu_Attendance_${new Date().toISOString().split('T')[0]}.csv`
+        });
+        link.click();
+        toast.success('Exported to CSV');
     };
 
-    if (loading) return <div className="p-8 text-center">Loading attendance...</div>;
+    const filteredAttendance = attendance.filter(r => {
+        const q = searchTerm.toLowerCase();
+        const name = r.student ? `${r.student.firstName} ${r.student.lastName}`.toLowerCase() : '';
+        return (name.includes(q) || (r.date && r.date.includes(q))) &&
+               (statusFilter === 'ALL' || r.status === statusFilter);
+    });
+
+    if (loading) return (
+        <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+                <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-sm text-slate-500">Loading attendance records...</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                    <Calendar className="w-5 h-5 mr-2 text-primary-600" /> Attendance Records
-                </h2>
-                {(user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER') && (
-                    <button 
-                        onClick={() => openModal()}
-                        className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 flex items-center transition-colors"
-                    >
-                        <Plus className="w-4 h-4 mr-2" /> Mark Attendance
-                    </button>
-                )}
-            </div>
+        <>
+            <div className="animate-fade-in-up">
+            <div className="section-card">
+                {/* Header */}
+                <div className="section-card-header">
+                    <div>
+                        <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <CalendarCheck className="w-4 h-4 text-indigo-500" />
+                            Attendance Log
+                        </h2>
+                        <p className="text-xs text-slate-400 mt-0.5">{attendance.length} record{attendance.length !== 1 ? 's' : ''} total</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={exportToCSV} className="btn-secondary gap-2">
+                            <Download className="w-3.5 h-3.5" /> Export CSV
+                        </button>
+                        {(rawRole === 'ADMIN' || rawRole === 'TEACHER') && (
+                            <button onClick={() => openModal()} className="btn-primary gap-2">
+                                <Plus className="w-3.5 h-3.5" /> Mark Attendance
+                            </button>
+                        )}
+                    </div>
+                </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
-                            <th className="px-6 py-4 font-semibold">Date</th>
-                            <th className="px-6 py-4 font-semibold">Student Name</th>
-                            <th className="px-6 py-4 font-semibold">Status</th>
-                            {(user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER') && (
-                                <th className="px-6 py-4 font-semibold">Approval Status</th>
+                {/* Search + Filter */}
+                <div className="px-5 py-3 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                        <input
+                            type="text"
+                            placeholder="Search by name or date…"
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2 glass-input rounded-xl text-sm focus:outline-none"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                        <Filter className="w-3.5 h-3.5" />
+                        <select
+                            value={statusFilter}
+                            onChange={e => setStatusFilter(e.target.value)}
+                            className="glass-input px-3 py-2 rounded-xl text-sm focus:outline-none"
+                        >
+                            <option value="ALL">All Statuses</option>
+                            <option value="PRESENT">Present</option>
+                            <option value="ABSENT">Absent</option>
+                            <option value="LATE">Late</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                    {filteredAttendance.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-slate-300">
+                            <Calendar className="w-12 h-12 mb-3" />
+                            <p className="text-sm font-medium text-slate-400">No attendance records found</p>
+                            {(rawRole === 'ADMIN' || rawRole === 'TEACHER') && (
+                                <button onClick={() => openModal()} className="btn-primary mt-4">
+                                    <Plus className="w-3.5 h-3.5 mr-1.5" /> Mark First Attendance
+                                </button>
                             )}
-                            {(user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER') && (
-                                <th className="px-6 py-4 font-semibold text-right">Actions</th>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {attendance.length === 0 ? (
-                            <tr>
-                                <td colSpan={user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER' ? "5" : "3"} className="px-6 py-8 text-center text-gray-500">
-                                    No attendance records found.
-                                </td>
-                            </tr>
-                        ) : (
-                            attendance.map((record) => (
-                                <tr key={record.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 text-gray-900 font-medium">{record.date}</td>
-                                    <td className="px-6 py-4 text-gray-600">
-                                        {record.student ? `${record.student.firstName} ${record.student.lastName}` : `ID: #${record.studentId || 'N/A'}`}
-                                    </td>
-                                    <td className="px-6 py-4">{getStatusBadge(record.status)}</td>
-                                    {(user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER') && (
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 text-xs font-bold rounded-full ${
-                                                record.approvalStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                                                record.approvalStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
-                                            }`}>
-                                                {record.approvalStatus || 'APPROVED'}
-                                            </span>
-                                        </td>
-                                    )}
-                                    {(user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_TEACHER') && (
-                                        <td className="px-6 py-4 text-right space-x-3">
-                                            <button 
-                                                onClick={() => openModal(record)}
-                                                className="text-blue-600 hover:text-blue-800 transition-colors"
-                                            >
-                                                <Edit2 className="w-4 h-4 inline" />
-                                            </button>
-                                            <button 
-                                                onClick={() => handleDelete(record.id)}
-                                                className="text-red-600 hover:text-red-800 transition-colors"
-                                            >
-                                                <Trash2 className="w-4 h-4 inline" />
-                                            </button>
-                                        </td>
+                        </div>
+                    ) : (
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                                    <th className="px-5 py-3.5">Date</th>
+                                    <th className="px-5 py-3.5">Student</th>
+                                    <th className="px-5 py-3.5">Status</th>
+                                    {(rawRole === 'ADMIN' || rawRole === 'TEACHER') && (
+                                        <>
+                                            <th className="px-5 py-3.5">Approval</th>
+                                            <th className="px-5 py-3.5 text-right">Actions</th>
+                                        </>
                                     )}
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {filteredAttendance.map(record => (
+                                    <tr key={record.id} className="table-row-hover">
+                                        <td className="px-5 py-3.5">
+                                            <span className="text-sm font-semibold text-slate-800">{record.date}</span>
+                                        </td>
+                                        <td className="px-5 py-3.5">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 rounded-lg gradient-bg flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                                    {record.student?.firstName?.charAt(0) || '?'}
+                                                </div>
+                                                <span className="text-sm font-medium text-slate-700">
+                                                    {record.student
+                                                        ? `${record.student.firstName} ${record.student.lastName}`
+                                                        : `Student #${record.studentId}`}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-3.5">{statusBadge(record.status)}</td>
+                                        {(rawRole === 'ADMIN' || rawRole === 'TEACHER') && (
+                                            <>
+                                                <td className="px-5 py-3.5">{approvalBadge(record.approvalStatus)}</td>
+                                                <td className="px-5 py-3.5 text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <button onClick={() => openModal(record)} className="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition" title="Edit">
+                                                            <Edit2 className="w-4 h-4" />
+                                                        </button>
+                                                        <button onClick={() => handleDelete(record.id)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Delete">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
             </div>
+        </div>
 
-            {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white">
-                            <h3 className="text-xl font-bold text-gray-900">
-                                {isEdit ? 'Edit Attendance' : 'Mark Attendance'}
-                            </h3>
-                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
-                                <X className="w-6 h-6" />
+        {/* Modal */}
+        {isModalOpen && (
+                <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setIsModalOpen(false)}>
+                    <div className="modal-box" style={{ maxWidth: '460px' }}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+                            <div>
+                                <h3 className="text-base font-extrabold text-slate-900">
+                                    {isEdit ? 'Edit Attendance' : 'Mark Attendance'}
+                                </h3>
+                                <p className="text-xs text-slate-400 mt-0.5">
+                                    {isEdit ? 'Update the attendance record' : 'Record student attendance'}
+                                </p>
+                            </div>
+                            <button onClick={() => setIsModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
-                                <select 
-                                    name="studentId" 
-                                    value={formData.studentId} 
-                                    onChange={handleInputChange} 
-                                    required 
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
-                                >
-                                    <option value="" disabled>Select Student</option>
-                                    {students.map(s => (
-                                        <option key={s.id} value={s.id}>{s.firstName} {s.lastName} (ID: {s.id})</option>
-                                    ))}
-                                </select>
+                        <form onSubmit={handleSubmit}>
+                            <div className="p-6 space-y-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Student <span className="text-rose-500">*</span></label>
+                                    <select
+                                        value={formData.studentId}
+                                        onChange={e => setFormData({...formData, studentId: e.target.value})}
+                                        required
+                                        className="w-full px-3 py-2.5 glass-input rounded-xl"
+                                    >
+                                        <option value="" disabled>— Select Student —</option>
+                                        {students.map(s => (
+                                            <option key={s.id} value={s.id}>{s.firstName} {s.lastName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Date <span className="text-rose-500">*</span></label>
+                                    <input
+                                        type="date" required
+                                        value={formData.date}
+                                        onChange={e => setFormData({...formData, date: e.target.value})}
+                                        className="w-full px-3 py-2.5 glass-input rounded-xl"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {['PRESENT', 'ABSENT', 'LATE'].map(s => (
+                                            <button
+                                                key={s} type="button"
+                                                onClick={() => setFormData({...formData, status: s})}
+                                                className={`py-2.5 rounded-xl text-xs font-bold border transition ${
+                                                    formData.status === s
+                                                        ? s === 'PRESENT' ? 'bg-emerald-500 text-white border-emerald-500'
+                                                          : s === 'ABSENT' ? 'bg-rose-500 text-white border-rose-500'
+                                                          : 'bg-amber-500 text-white border-amber-500'
+                                                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                                }`}
+                                            >
+                                                {s === 'PRESENT' ? '✓ Present' : s === 'ABSENT' ? '✗ Absent' : '⏱ Late'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                                <input 
-                                    type="date" 
-                                    name="date" 
-                                    value={formData.date} 
-                                    onChange={handleInputChange} 
-                                    required 
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select 
-                                    name="status" 
-                                    value={formData.status} 
-                                    onChange={handleInputChange} 
-                                    required 
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
-                                >
-                                    <option value="PRESENT">Present</option>
-                                    <option value="ABSENT">Absent</option>
-                                    <option value="LATE">Late</option>
-                                </select>
-                            </div>
-                            
-                            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                                <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors">
-                                    Cancel
-                                </button>
-                                <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors">
-                                    {isEdit ? 'Update' : 'Save'}
-                                </button>
+                            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50/60 rounded-b-[20px]">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary">Cancel</button>
+                                <button type="submit" className="btn-primary">{isEdit ? 'Update' : 'Save Attendance'}</button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

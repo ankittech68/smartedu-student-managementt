@@ -1,35 +1,25 @@
-# Maven Build Target
-smartedu-backend/target/
-target/
-
 # Node Modules and Production Builds
 smartedu-frontend/node_modules/
 smartedu-frontend/dist/
+smartedu-backend/node_modules/
 node_modules/
 dist/
 
-# Local Environment Variables and Scripts
-.env.development
+# Local Environment Variables and Secrets
+.env
 .env.local
+.env.development
 .env.*.local
+smartedu-backend/.env
+
+# Local Test Scripts & Logs
 test_auth_flow.ps1
 smartedu-frontend/lint_output.txt
-
-# Editor directories and files
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.DS_Store
-
-# Logs
 logs/
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+
+# Editor directories
+.vscode/
+.idea/
+.DS_Store

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Check, Clock } from 'lucide-react';
+import { Bell, Check, Clock, CheckCheck } from 'lucide-react';
 import api from '../services/api';
 
 const NotificationDropdown = () => {
@@ -10,7 +10,7 @@ const NotificationDropdown = () => {
     const fetchNotifications = async () => {
         try {
             const response = await api.get('/notifications');
-            setNotifications(response.data);
+            setNotifications(response.data || []);
         } catch (error) {
             console.error('Failed to fetch notifications', error);
         }
@@ -18,8 +18,6 @@ const NotificationDropdown = () => {
 
     useEffect(() => {
         fetchNotifications();
-        
-        // Polling every 30 seconds for new notifications
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, []);
@@ -30,7 +28,6 @@ const NotificationDropdown = () => {
                 setIsOpen(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
@@ -38,77 +35,110 @@ const NotificationDropdown = () => {
     const markAsRead = async (id) => {
         try {
             await api.put(`/notifications/${id}/read`);
-            setNotifications(notifications.map(n => 
-                n.id === id ? { ...n, read: true } : n
+            setNotifications(notifications.map(n =>
+                n.id === id ? { ...n, read: true, isRead: true } : n
             ));
         } catch (error) {
             console.error('Failed to mark notification as read', error);
         }
     };
 
-    const unreadCount = notifications.filter(n => !n.read).length;
+    const markAllAsRead = async () => {
+        try {
+            await api.put('/notifications/read-all');
+            setNotifications(notifications.map(n => ({ ...n, read: true, isRead: true })));
+        } catch (error) {
+            console.error('Failed to mark all notifications as read', error);
+        }
+    };
+
+    const unreadCount = notifications.filter(n => !(n.read || n.isRead)).length;
 
     const formatDate = (dateString) => {
+        if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button 
+            <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="relative p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition focus:outline-none"
+                title="Notifications"
             >
-                <Bell className="w-6 h-6" />
+                <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white">
+                    <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-rose-500 rounded-full ring-2 ring-white">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                    <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="text-sm font-semibold text-gray-800">Notifications</h3>
-                        <span className="text-xs text-gray-500">{unreadCount} unread</span>
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden z-50 animate-fade-in">
+                    {/* Panel Header */}
+                    <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Notifications</h3>
+                            {unreadCount > 0 && (
+                                <span className="badge badge-indigo text-[10px] py-0 px-2">{unreadCount} new</span>
+                            )}
+                        </div>
+                        {unreadCount > 0 && (
+                            <button
+                                onClick={markAllAsRead}
+                                className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2.5 py-1 rounded-lg transition"
+                                title="Mark all notifications as read"
+                            >
+                                <CheckCheck className="w-3.5 h-3.5" />
+                                Read All
+                            </button>
+                        )}
                     </div>
 
+                    {/* Notification List */}
                     <div className="max-h-96 overflow-y-auto">
                         {notifications.length === 0 ? (
-                            <div className="p-4 text-center text-sm text-gray-500">
-                                No notifications found.
+                            <div className="p-8 text-center text-xs text-slate-400">
+                                <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                                No notifications yet.
                             </div>
                         ) : (
-                            <div className="divide-y divide-gray-100">
-                                {notifications.map(notification => (
-                                    <div 
-                                        key={notification.id} 
-                                        className={`p-4 ${!notification.read ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
-                                    >
-                                        <div className="flex justify-between items-start mb-1">
-                                            <h4 className={`text-sm font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
-                                                {notification.title}
-                                            </h4>
-                                            {!notification.read && (
-                                                <button 
-                                                    onClick={() => markAsRead(notification.id)}
-                                                    className="text-primary-600 hover:text-primary-800 p-1 rounded-full hover:bg-primary-50"
-                                                    title="Mark as read"
-                                                >
-                                                    <Check className="w-3 h-3" />
-                                                </button>
-                                            )}
+                            <div className="divide-y divide-slate-100">
+                                {notifications.map(notification => {
+                                    const isUnread = !(notification.read || notification.isRead);
+                                    return (
+                                        <div
+                                            key={notification.id}
+                                            className={`p-3.5 transition-colors ${
+                                                isUnread ? 'bg-indigo-50/40 hover:bg-indigo-50/70' : 'hover:bg-slate-50/80'
+                                            }`}
+                                        >
+                                            <div className="flex items-start justify-between gap-2 mb-1">
+                                                <h4 className={`text-xs font-bold ${isUnread ? 'text-slate-900' : 'text-slate-700'}`}>
+                                                    {notification.title}
+                                                </h4>
+                                                {isUnread && (
+                                                    <button
+                                                        onClick={() => markAsRead(notification.id)}
+                                                        className="text-indigo-600 hover:text-indigo-800 p-1 rounded-md hover:bg-indigo-100 transition shrink-0"
+                                                        title="Mark as read"
+                                                    >
+                                                        <Check className="w-3.5 h-3.5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-slate-600 mb-2 leading-relaxed">
+                                                {notification.message}
+                                            </p>
+                                            <div className="flex items-center text-[10px] text-slate-400 font-medium">
+                                                <Clock className="w-3 h-3 mr-1 text-slate-400" />
+                                                {formatDate(notification.timestamp)}
+                                            </div>
                                         </div>
-                                        <p className="text-sm text-gray-600 mb-2">
-                                            {notification.message}
-                                        </p>
-                                        <div className="flex items-center text-xs text-gray-500">
-                                            <Clock className="w-3 h-3 mr-1" />
-                                            {formatDate(notification.timestamp)}
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
