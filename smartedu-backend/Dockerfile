@@ -1,11 +1,21 @@
-FROM maven:3.9.6-eclipse-temurin-17
+FROM node:18-alpine
 
+# Create app directory
 WORKDIR /app
 
+# Install dependencies first (cached layer)
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy application source
 COPY . .
 
-RUN mvn clean package -DskipTests
+# Expose the application port
+EXPOSE 5000
 
-EXPOSE 9999
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget -qO- http://localhost:5000/api/health || exit 1
 
-CMD ["java", "-jar", "target/smartedu-backend-0.0.1-SNAPSHOT.jar"]
+# Start the server
+CMD ["node", "server.js"]

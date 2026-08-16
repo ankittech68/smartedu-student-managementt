@@ -11,15 +11,16 @@ async function seedDemoUsers() {
         ];
 
         for (const u of demoUsers) {
-            const hashedPassword = await bcrypt.hash(u.password, 10);
-            const [existing] = await pool.execute('SELECT id FROM users WHERE username = ?', [u.username]);
-            
+            const [existing] = await pool.execute('SELECT id, password FROM users WHERE username = ?', [u.username]);
+
             if (existing.length === 0) {
+                // New user — create with hashed password
+                const hashedPassword = await bcrypt.hash(u.password, 10);
                 const [userRes] = await pool.execute(
                     'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
                     [u.username, u.email, hashedPassword, u.role]
                 );
-                
+
                 // If student, seed a default student profile too
                 if (u.role === 'STUDENT') {
                     const [studentRes] = await pool.execute(
@@ -43,14 +44,20 @@ async function seedDemoUsers() {
                          'Computer Networks', 78, 100, 'A', 'APPROVED', studentRes.insertId]
                     );
                 }
-                console.log(`Seeded demo user: ${u.username} (${u.role})`);
+                console.log(`✅ Seeded demo user: ${u.username} (${u.role})`);
             } else {
-                // Ensure existing demo users always match the 1-click password
-                await pool.execute(
-                    'UPDATE users SET password = ?, role = ? WHERE username = ?',
-                    [hashedPassword, u.role, u.username]
-                );
-                console.log(`Updated demo credentials for: ${u.username} (${u.role})`);
+                // User exists — only update if password does NOT already match (avoids re-hashing every restart)
+                const passwordMatches = await bcrypt.compare(u.password, existing[0].password);
+                if (!passwordMatches) {
+                    const hashedPassword = await bcrypt.hash(u.password, 10);
+                    await pool.execute(
+                        'UPDATE users SET password = ?, role = ? WHERE username = ?',
+                        [hashedPassword, u.role, u.username]
+                    );
+                    console.log(`🔄 Updated demo credentials for: ${u.username} (${u.role})`);
+                } else {
+                    console.log(`✓ Demo user already up to date: ${u.username}`);
+                }
             }
         }
     } catch (error) {
@@ -60,24 +67,26 @@ async function seedDemoUsers() {
 
 async function initDb() {
     try {
-        console.log('Checking and initializing database schema...');
+        console.log('🔧 Checking and initializing database schema...');
 
-        const host = process.env.DB_HOST || 'localhost';
+        const host = process.env.DB_HOST;
         const port = parseInt(process.env.DB_PORT || '3306', 10);
-        const user = process.env.DB_USER || 'root';
-        const password = process.env.DB_PASSWORD || '';
+        const user = process.env.DB_USER;
+        const password = process.env.DB_PASSWORD;
         const dbName = process.env.DB_NAME || 'smartedu';
 
         // Auto-create database if it does not exist
-        const tempConn = await mysql.createConnection({
-            host,
-            port,
-            user,
-            password
-        });
-        await tempConn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
-        await tempConn.end();
-        
+        // Note: Some hosted MySQL providers (PlanetScale) don't allow CREATE DATABASE
+        // — in that case, the database is pre-created via the provider dashboard
+        try {
+            const tempConn = await mysql.createConnection({ host, port, user, password });
+            await tempConn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+            await tempConn.end();
+        } catch (dbCreateErr) {
+            // Hosted providers may not allow this — not fatal if DB already exists
+            console.warn('⚠️  Could not auto-create database (may already exist or provider restricts it):', dbCreateErr.message);
+        }
+
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
               id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -140,7 +149,7 @@ async function initDb() {
             )
         `);
 
-        // Migration runner equivalent: migrate any null approval_status to 'APPROVED'
+        // Data migration: normalize any null approval_status values
         try {
             await pool.query("UPDATE attendance SET approval_status = 'APPROVED' WHERE approval_status IS NULL");
             await pool.query("UPDATE marks SET approval_status = 'APPROVED' WHERE approval_status IS NULL");
@@ -151,9 +160,9 @@ async function initDb() {
         // Seed recruiter demo users
         await seedDemoUsers();
 
-        console.log('Database schema & demo user verification complete.');
+        console.log('✅ Database schema & demo user verification complete.');
     } catch (error) {
-        console.error('Error initializing database schema:', error);
+        console.error('❌ Error initializing database schema:', error);
     }
 }
 

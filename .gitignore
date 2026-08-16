@@ -1,25 +1,39 @@
-# Node Modules and Production Builds
+# ─── Node Modules and Production Builds ──────────────────────────────────────
 smartedu-frontend/node_modules/
 smartedu-frontend/dist/
 smartedu-backend/node_modules/
 node_modules/
 dist/
 
-# Local Environment Variables and Secrets
+# ─── Local Environment Variables and Secrets ─────────────────────────────────
+# Backend
 .env
 .env.local
-.env.development
 .env.*.local
 smartedu-backend/.env
+smartedu-backend/.env.local
 
-# Local Test Scripts & Logs
-test_auth_flow.ps1
-smartedu-frontend/lint_output.txt
+# Frontend
+smartedu-frontend/.env
+smartedu-frontend/.env.local
+smartedu-frontend/.env.production
+smartedu-frontend/.env.*.local
+
+# ─── Logs and Temporary Files ─────────────────────────────────────────────────
 logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
 
-# Editor directories
+# ─── Editor Directories ───────────────────────────────────────────────────────
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+
+# ─── Java / Spring Boot Artifacts (legacy — removed) ─────────────────────────
+target/
+*.class
+*.jar
+*.war
+pom.xml

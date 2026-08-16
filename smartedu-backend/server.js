@@ -16,9 +16,11 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const approvalRoutes = require('./routes/approvalRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 9999;
 
-// CORS setup matching WebSecurityConfig.java
+// Use Render-provided PORT or fallback to 5000 for local dev
+const PORT = process.env.PORT || 5000;
+
+// CORS configuration — supports both local dev and production (Vercel)
 const allowedOrigins = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
@@ -27,16 +29,17 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl, or Postman)
+        // Allow requests with no origin (mobile apps, curl, Postman, Render health checks)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.some(o => origin.startsWith(o) || o === '*')) {
+        // Check explicit allowed list
+        if (allowedOrigins.some(o => origin.startsWith(o))) {
             return callback(null, true);
         }
-        // Allow regex / wildcard patterns like .onrender.com or .vercel.app
+        // Allow any *.onrender.com or *.vercel.app subdomain
         if (/\.onrender\.com$/.test(origin) || /\.vercel\.app$/.test(origin)) {
             return callback(null, true);
         }
-        return callback(null, true); // Fallback allow in dev
+        return callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -59,14 +62,24 @@ app.use('/api/marks', marksRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/approvals', approvalRoutes);
 
-// Health check endpoint
+// Health check endpoint — used to verify Render deployment
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'UP', timestamp: new Date() });
+    res.json({
+        success: true,
+        message: 'SmartEdu backend is running',
+        timestamp: new Date().toISOString()
+    });
 });
 
-// Centralized error middleware
+// 404 handler for unknown routes
+app.use((req, res) => {
+    res.status(404).json({ success: false, message: 'Route not found' });
+});
+
+// Centralized error middleware (must be last)
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`SmartEdu server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
