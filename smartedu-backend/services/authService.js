@@ -18,11 +18,14 @@ async function authenticateUser(username, password) {
     // Role format returned to frontend
     const roleWithPrefix = user.role.startsWith('ROLE_') ? user.role : `ROLE_${user.role}`;
 
+    const isDemo = Boolean(user.is_demo);
+
     const tokenPayload = {
         id: user.id,
         username: user.username,
         email: user.email,
-        role: roleWithPrefix
+        role: roleWithPrefix,
+        isDemo: isDemo
     };
 
     const token = generateToken(tokenPayload);
@@ -33,7 +36,8 @@ async function authenticateUser(username, password) {
         id: user.id,
         username: user.username,
         email: user.email,
-        role: roleWithPrefix
+        role: roleWithPrefix,
+        isDemo: isDemo
     };
 }
 
@@ -61,7 +65,7 @@ async function registerUser({ username, email, password, role }) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await pool.execute(
-        'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+        'INSERT INTO users (username, email, password, role, is_demo) VALUES (?, ?, ?, ?, 0)',
         [username, email, hashedPassword, userRole]
     );
 
@@ -69,7 +73,8 @@ async function registerUser({ username, email, password, role }) {
         await notificationService.createNotificationForRole(
             'ADMIN',
             'New Student Registered',
-            `A new student (${username}) has registered.`
+            `A new student (${username}) has registered.`,
+            false // isDemo = false for normal user registrations
         );
     }
 

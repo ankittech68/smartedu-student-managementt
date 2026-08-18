@@ -34,20 +34,22 @@ function mapMarksRow(row) {
     };
 }
 
-async function getMarksById(id) {
+async function getMarksById(id, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const [rows] = await pool.execute(`
         SELECT m.*, s.first_name, s.last_name, s.email as s_email, s.username as s_username, s.user_id as s_user_id
         FROM marks m
         JOIN students s ON m.student_id = s.id
-        WHERE m.id = ?
-    `, [id]);
+        WHERE m.id = ? AND m.is_demo = ?
+    `, [id, demoFlag]);
     if (rows.length === 0) {
         throw new Error('Marks record not found with id: ' + id);
     }
     return mapMarksRow(rows[0]);
 }
 
-async function addMarks(marksData) {
+async function addMarks(marksData, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const studentId = marksData.studentId || marksData.student?.id;
     if (!studentId) {
         throw new Error('Student ID is required');
@@ -60,53 +62,59 @@ async function addMarks(marksData) {
     const approvalStatus = 'PENDING';
 
     const [result] = await pool.execute(
-        'INSERT INTO marks (subject, marks_obtained, total_marks, grade, approval_status, student_id) VALUES (?, ?, ?, ?, ?, ?)',
-        [subject, marksObtained, totalMarks, grade, approvalStatus, studentId]
+        'INSERT INTO marks (subject, marks_obtained, total_marks, grade, approval_status, student_id, is_demo) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [subject, marksObtained, totalMarks, grade, approvalStatus, studentId, demoFlag]
     );
 
     await notificationService.createNotificationForRole(
         'ADMIN',
         'Pending Marks',
-        'New marks record pending approval.'
+        'New marks record pending approval.',
+        isDemo
     );
 
-    return getMarksById(result.insertId);
+    return getMarksById(result.insertId, isDemo);
 }
 
-async function getMarksByStudent(studentId) {
+async function getMarksByStudent(studentId, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const [rows] = await pool.execute(`
         SELECT m.*, s.first_name, s.last_name, s.email as s_email, s.username as s_username, s.user_id as s_user_id
         FROM marks m
         JOIN students s ON m.student_id = s.id
-        WHERE m.student_id = ?
+        WHERE m.student_id = ? AND m.is_demo = ?
         ORDER BY m.id DESC
-    `, [studentId]);
+    `, [studentId, demoFlag]);
     return rows.map(mapMarksRow);
 }
 
-async function getApprovedMarksByStudent(studentId) {
+async function getApprovedMarksByStudent(studentId, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const [rows] = await pool.execute(`
         SELECT m.*, s.first_name, s.last_name, s.email as s_email, s.username as s_username, s.user_id as s_user_id
         FROM marks m
         JOIN students s ON m.student_id = s.id
-        WHERE m.student_id = ? AND m.approval_status = 'APPROVED'
+        WHERE m.student_id = ? AND m.approval_status = 'APPROVED' AND m.is_demo = ?
         ORDER BY m.id DESC
-    `, [studentId]);
+    `, [studentId, demoFlag]);
     return rows.map(mapMarksRow);
 }
 
-async function getAllMarks() {
+async function getAllMarks(isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const [rows] = await pool.execute(`
         SELECT m.*, s.first_name, s.last_name, s.email as s_email, s.username as s_username, s.user_id as s_user_id
         FROM marks m
         JOIN students s ON m.student_id = s.id
+        WHERE m.is_demo = ?
         ORDER BY m.id DESC
-    `);
+    `, [demoFlag]);
     return rows.map(mapMarksRow);
 }
 
-async function updateMarks(id, marksDetails) {
-    await getMarksById(id);
+async function updateMarks(id, marksDetails, isDemo = false) {
+    await getMarksById(id, isDemo);
+    const demoFlag = isDemo ? 1 : 0;
 
     const subject = marksDetails.subject;
     const marksObtained = parseFloat(marksDetails.marksObtained);
@@ -115,43 +123,47 @@ async function updateMarks(id, marksDetails) {
     const approvalStatus = 'PENDING';
 
     await pool.execute(
-        'UPDATE marks SET subject = ?, marks_obtained = ?, total_marks = ?, grade = ?, approval_status = ? WHERE id = ?',
-        [subject, marksObtained, totalMarks, grade, approvalStatus, id]
+        'UPDATE marks SET subject = ?, marks_obtained = ?, total_marks = ?, grade = ?, approval_status = ? WHERE id = ? AND is_demo = ?',
+        [subject, marksObtained, totalMarks, grade, approvalStatus, id, demoFlag]
     );
 
     await notificationService.createNotificationForRole(
         'ADMIN',
         'Pending Marks',
-        'Marks record updated and pending approval.'
+        'Marks record updated and pending approval.',
+        isDemo
     );
 
-    return getMarksById(id);
+    return getMarksById(id, isDemo);
 }
 
-async function updateApprovalStatus(id, status) {
-    await getMarksById(id);
+async function updateApprovalStatus(id, status, isDemo = false) {
+    await getMarksById(id, isDemo);
+    const demoFlag = isDemo ? 1 : 0;
 
     await pool.execute(
-        'UPDATE marks SET approval_status = ? WHERE id = ?',
-        [status, id]
+        'UPDATE marks SET approval_status = ? WHERE id = ? AND is_demo = ?',
+        [status, id, demoFlag]
     );
 
-    const updated = await getMarksById(id);
+    const updated = await getMarksById(id, isDemo);
 
     if (updated.student && updated.student.userId) {
         await notificationService.createNotification(
             updated.student.userId,
             `Marks ${status}`,
-            `Your marks for ${updated.subject} were ${status}`
+            `Your marks for ${updated.subject} were ${status}`,
+            isDemo
         );
     }
 
     return updated;
 }
 
-async function deleteMarks(id) {
-    await getMarksById(id);
-    await pool.execute('DELETE FROM marks WHERE id = ?', [id]);
+async function deleteMarks(id, isDemo = false) {
+    await getMarksById(id, isDemo);
+    const demoFlag = isDemo ? 1 : 0;
+    await pool.execute('DELETE FROM marks WHERE id = ? AND is_demo = ?', [id, demoFlag]);
 }
 
 module.exports = {

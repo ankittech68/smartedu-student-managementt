@@ -15,7 +15,8 @@ function generateToken(userPayload) {
             id: userPayload.id,
             username: userPayload.username,
             email: userPayload.email,
-            role: userPayload.role
+            role: userPayload.role,
+            isDemo: Boolean(userPayload.isDemo)
         },
         JWT_SECRET,
         { expiresIn: JWT_EXPIRES_IN }

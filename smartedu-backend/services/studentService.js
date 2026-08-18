@@ -22,7 +22,8 @@ function mapStudentRow(row) {
     };
 }
 
-async function saveStudent(studentData) {
+async function saveStudent(studentData, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     let rawUserId = studentData.user?.id || studentData.userId || null;
     let userId = (rawUserId && String(rawUserId).trim() !== '') ? rawUserId : null;
 
@@ -34,15 +35,15 @@ async function saveStudent(studentData) {
 
     let matchedUser = null;
     if (userId) {
-        const [users] = await pool.execute('SELECT * FROM users WHERE id = ?', [userId]);
+        const [users] = await pool.execute('SELECT * FROM users WHERE id = ? AND is_demo = ?', [userId, demoFlag]);
         if (users.length > 0) matchedUser = users[0];
     }
     if (!matchedUser && email) {
-        const [users] = await pool.execute('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [email]);
+        const [users] = await pool.execute('SELECT * FROM users WHERE LOWER(email) = LOWER(?) AND is_demo = ?', [email, demoFlag]);
         if (users.length > 0) matchedUser = users[0];
     }
     if (!matchedUser && username) {
-        const [users] = await pool.execute('SELECT * FROM users WHERE LOWER(username) = LOWER(?)', [username]);
+        const [users] = await pool.execute('SELECT * FROM users WHERE LOWER(username) = LOWER(?) AND is_demo = ?', [username, demoFlag]);
         if (users.length > 0) matchedUser = users[0];
     }
 
@@ -68,31 +69,34 @@ async function saveStudent(studentData) {
     const address = (rawAddress && String(rawAddress).trim() !== '') ? rawAddress : null;
 
     const [result] = await pool.execute(
-        `INSERT INTO students (first_name, last_name, date_of_birth, enrollment_date, phone, address, user_id, email, username)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [firstName, lastName, dateOfBirth, enrollmentDate, phone, address, userId, email, username]
+        `INSERT INTO students (first_name, last_name, date_of_birth, enrollment_date, phone, address, user_id, email, username, is_demo)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [firstName, lastName, dateOfBirth, enrollmentDate, phone, address, userId, email, username, demoFlag]
     );
 
-    return getStudentById(result.insertId);
+    return getStudentById(result.insertId, isDemo);
 }
 
-async function getAllStudents() {
+async function getAllStudents(isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const [rows] = await pool.execute(`
         SELECT s.*, u.username as u_username, u.email as u_email, u.role as u_role
         FROM students s
         LEFT JOIN users u ON s.user_id = u.id
+        WHERE s.is_demo = ?
         ORDER BY s.id ASC
-    `);
+    `, [demoFlag]);
     return rows.map(mapStudentRow);
 }
 
-async function getStudentById(id) {
+async function getStudentById(id, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
     const [rows] = await pool.execute(`
         SELECT s.*, u.username as u_username, u.email as u_email, u.role as u_role
         FROM students s
         LEFT JOIN users u ON s.user_id = u.id
-        WHERE s.id = ?
-    `, [id]);
+        WHERE s.id = ? AND s.is_demo = ?
+    `, [id, demoFlag]);
 
     if (rows.length === 0) {
         throw new Error('Student not found with id: ' + id);
@@ -100,8 +104,9 @@ async function getStudentById(id) {
     return mapStudentRow(rows[0]);
 }
 
-async function getStudentByUserId(userId) {
-    const [users] = await pool.execute('SELECT * FROM users WHERE id = ?', [userId]);
+async function getStudentByUserId(userId, isDemo = false) {
+    const demoFlag = isDemo ? 1 : 0;
+    const [users] = await pool.execute('SELECT * FROM users WHERE id = ? AND is_demo = ?', [userId, demoFlag]);
     if (users.length === 0) {
         throw new Error('User not found with id: ' + userId);
     }
@@ -112,8 +117,8 @@ async function getStudentByUserId(userId) {
         SELECT s.*, u.username as u_username, u.email as u_email, u.role as u_role
         FROM students s
         LEFT JOIN users u ON s.user_id = u.id
-        WHERE s.user_id = ?
-    `, [userId]);
+        WHERE s.user_id = ? AND s.is_demo = ?
+    `, [userId, demoFlag]);
 
     // 2. Check by email
     if (students.length === 0 && user.email) {
@@ -121,8 +126,8 @@ async function getStudentByUserId(userId) {
             SELECT s.*, u.username as u_username, u.email as u_email, u.role as u_role
             FROM students s
             LEFT JOIN users u ON s.user_id = u.id
-            WHERE LOWER(s.email) = LOWER(?)
-        `, [user.email]);
+            WHERE LOWER(s.email) = LOWER(?) AND s.is_demo = ?
+        `, [user.email, demoFlag]);
     }
 
     // 3. Check by username
@@ -131,14 +136,14 @@ async function getStudentByUserId(userId) {
             SELECT s.*, u.username as u_username, u.email as u_email, u.role as u_role
             FROM students s
             LEFT JOIN users u ON s.user_id = u.id
-            WHERE LOWER(s.username) = LOWER(?)
-        `, [user.username]);
+            WHERE LOWER(s.username) = LOWER(?) AND s.is_demo = ?
+        `, [user.username, demoFlag]);
     }
 
     // If matched by email/username but user_id was null, link them
     if (students.length > 0 && !students[0].user_id) {
-        await pool.execute('UPDATE students SET user_id = ? WHERE id = ?', [userId, students[0].id]);
-        return getStudentById(students[0].id);
+        await pool.execute('UPDATE students SET user_id = ? WHERE id = ? AND is_demo = ?', [userId, students[0].id, demoFlag]);
+        return getStudentById(students[0].id, isDemo);
     }
 
     // If still missing and user's role is STUDENT, auto-create profile
@@ -151,7 +156,7 @@ async function getStudentByUserId(userId) {
             email: user.email,
             username: user.username,
             userId: user.id
-        });
+        }, isDemo);
         return newStudent;
     }
 
@@ -162,8 +167,9 @@ async function getStudentByUserId(userId) {
     return mapStudentRow(students[0]);
 }
 
-async function updateStudent(id, studentDetails) {
-    const existing = await getStudentById(id);
+async function updateStudent(id, studentDetails, isDemo = false) {
+    const existing = await getStudentById(id, isDemo);
+    const demoFlag = isDemo ? 1 : 0;
 
     const firstName = studentDetails.firstName !== undefined ? studentDetails.firstName : existing.firstName;
     const lastName = studentDetails.lastName !== undefined ? studentDetails.lastName : existing.lastName;
@@ -183,16 +189,17 @@ async function updateStudent(id, studentDetails) {
     await pool.execute(
         `UPDATE students 
          SET first_name = ?, last_name = ?, date_of_birth = ?, enrollment_date = ?, phone = ?, address = ?
-         WHERE id = ?`,
-        [firstName, lastName, dateOfBirth, enrollmentDate, phone, address, id]
+         WHERE id = ? AND is_demo = ?`,
+        [firstName, lastName, dateOfBirth, enrollmentDate, phone, address, id, demoFlag]
     );
 
-    return getStudentById(id);
+    return getStudentById(id, isDemo);
 }
 
-async function deleteStudent(id) {
-    await getStudentById(id); // Ensure exists
-    await pool.execute('DELETE FROM students WHERE id = ?', [id]);
+async function deleteStudent(id, isDemo = false) {
+    await getStudentById(id, isDemo); // Ensure exists within user's scope
+    const demoFlag = isDemo ? 1 : 0;
+    await pool.execute('DELETE FROM students WHERE id = ? AND is_demo = ?', [id, demoFlag]);
 }
 
 module.exports = {

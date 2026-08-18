@@ -2,7 +2,7 @@ const approvalService = require('../services/approvalService');
 
 async function getPendingApprovals(req, res, next) {
     try {
-        const data = await approvalService.getPendingApprovals();
+        const data = await approvalService.getPendingApprovals(Boolean(req.user?.isDemo));
         return res.json(data);
     } catch (error) {
         next(error);
@@ -11,7 +11,7 @@ async function getPendingApprovals(req, res, next) {
 
 async function approveAllPending(req, res, next) {
     try {
-        const result = await approvalService.approveAllPending();
+        const result = await approvalService.approveAllPending(Boolean(req.user?.isDemo));
         return res.json(result);
     } catch (error) {
         next(error);
@@ -20,7 +20,7 @@ async function approveAllPending(req, res, next) {
 
 async function rejectAllPending(req, res, next) {
     try {
-        const result = await approvalService.rejectAllPending();
+        const result = await approvalService.rejectAllPending(Boolean(req.user?.isDemo));
         return res.json(result);
     } catch (error) {
         next(error);

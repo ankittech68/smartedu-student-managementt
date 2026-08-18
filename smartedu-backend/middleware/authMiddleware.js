@@ -9,7 +9,10 @@ function requireAuth(req, res, next) {
 
         const token = authHeader.split(' ')[1];
         const decoded = verifyToken(token);
-        req.user = decoded;
+        req.user = {
+            ...decoded,
+            isDemo: Boolean(decoded.isDemo)
+        };
         next();
     } catch (error) {
         return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
