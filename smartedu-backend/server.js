@@ -79,7 +79,8 @@ app.use((req, res) => {
 // Centralized error middleware (must be last)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+// Listen on all network interfaces (required for Docker and cloud deployment)
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`SmartEdu server running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

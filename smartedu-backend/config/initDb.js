@@ -46,18 +46,7 @@ async function seedDemoUsers() {
                 }
                 console.log(`✅ Seeded demo user: ${u.username} (${u.role})`);
             } else {
-                // User exists — only update if password does NOT already match (avoids re-hashing every restart)
-                const passwordMatches = await bcrypt.compare(u.password, existing[0].password);
-                if (!passwordMatches) {
-                    const hashedPassword = await bcrypt.hash(u.password, 10);
-                    await pool.execute(
-                        'UPDATE users SET password = ?, role = ? WHERE username = ?',
-                        [hashedPassword, u.role, u.username]
-                    );
-                    console.log(`🔄 Updated demo credentials for: ${u.username} (${u.role})`);
-                } else {
-                    console.log(`✓ Demo user already up to date: ${u.username}`);
-                }
+                console.log(`✓ Demo user already exists: ${u.username}`);
             }
         }
     } catch (error) {

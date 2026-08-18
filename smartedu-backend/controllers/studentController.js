@@ -62,7 +62,7 @@ async function deleteStudent(req, res, next) {
     try {
         const { id } = req.params;
         await studentService.deleteStudent(id);
-        return res.ok ? res.ok().build() : res.json({ success: true, message: 'Student deleted successfully' });
+        return res.json({ success: true, message: 'Student deleted successfully' });
     } catch (error) {
         next(error);
     }
