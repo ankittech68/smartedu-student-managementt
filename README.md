@@ -1,336 +1,319 @@
-# 🎓 SmartEdu - Student Management Portal
+# SmartEdu Student Management Portal
 
-> **A placement-ready, full-stack enterprise web application** built with **React 19 + Node.js + Express.js + MySQL**. SmartEdu streamlines academic administration with role-based dashboards, attendance tracking, marks management, approval workflows, and real-time notifications.
-
-[![GitHub Repo](https://img.shields.io/badge/GitHub-smartedu--student--managementt-181717?logo=github&style=flat-square)](https://github.com/ankittech68/smartedu-student-managementt)
-![React](https://img.shields.io/badge/React-19-61dafb?logo=react&style=flat-square)
-![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&style=flat-square)
-![Express.js](https://img.shields.io/badge/Express.js-4-000000?logo=express&style=flat-square)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479a1?logo=mysql&style=flat-square)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-06b6d4?logo=tailwindcss&style=flat-square)
+A full-stack, enterprise-ready web application designed to streamline student registration, academic record tracking, attendance management, examination marks recording, and automated grade calculations with multi-role access control.
 
 ---
 
-## � Production Deployment (NEW!)
+## 1. Project Overview
 
-> **Your SmartEdu application is now production-ready!** Complete deployment guides and configuration templates are included.
-
-### 📚 Deployment Documentation
-
-| Guide | Purpose | Time |
-|---|---|---|
-| [**DEPLOYMENT_COMPLETE_SUMMARY.md**](./DEPLOYMENT_COMPLETE_SUMMARY.md) | ⭐ **START HERE** - Complete summary of files changed, env vars needed, and deployment steps | 5 min |
-| [**PRODUCTION_DEPLOYMENT.md**](./PRODUCTION_DEPLOYMENT.md) | Step-by-step deployment guide for Render + MySQL + Vercel | 1-2 hours |
-| [**DATABASE_EXPORT_IMPORT.md**](./DATABASE_EXPORT_IMPORT.md) | How to export local database and import to production MySQL | 30 min |
-| [**VERCEL_FRONTEND_DEPLOYMENT.md**](./VERCEL_FRONTEND_DEPLOYMENT.md) | How to update frontend API URL and deploy to Vercel | 15 min |
-| [**PRODUCTION_REFERENCE.md**](./PRODUCTION_REFERENCE.md) | Quick reference: env variables, Render settings, Vercel settings, troubleshooting | Ongoing |
-
-### 🎯 Quick Deployment Checklist
-
-1. **Read** `DEPLOYMENT_COMPLETE_SUMMARY.md` (overview of everything needed)
-2. **Export** local database: Follow `DATABASE_EXPORT_IMPORT.md`
-3. **Create** cloud MySQL: PlanetScale, Railway, or AWS RDS
-4. **Deploy** backend: Render Web Service with Node.js
-5. **Update** frontend: Set `VITE_API_URL` to your Render backend
-6. **Test** everything: Use guides in `PRODUCTION_REFERENCE.md`
-
-### ✅ What's Already Done
-
-- ✓ Node.js Express server configured for cloud deployment
-- ✓ MySQL connection pool with proper error handling
-- ✓ JWT authentication secure and configurable
-- ✓ CORS properly set up for production
-- ✓ `.gitignore` blocks all `.env` files (secrets safe)
-- ✓ Database schema exported and ready
-- ✓ Docker support ready (Dockerfile included)
-
-### 🔧 What You Need To Do
-
-1. Export local database backup (SQL file)
-2. Create managed MySQL (PlanetScale/Railway/AWS)
-3. Deploy backend to Render
-4. Update frontend API URL
-5. Test production stack
-
-**Total Time**: 2-4 hours | **Downtime**: None | **Cost**: Free tier available
+The **SmartEdu Student Management Portal** provides an intuitive, robust, and secure digital platform for educational institutions. Built with a modern **React (Vite)** frontend and an **Express.js (Node.js)** REST API backed by **MySQL**, SmartEdu simplifies administrative tasks, provides faculty members with fast workflows for recording marks and attendance, and gives students real-time visibility into their academic progress.
 
 ---
 
-## �📸 Application Preview
+## 2. Key Features
 
-| Login Page | Admin Dashboard | Students Page |
-|---|---|---|
-| Dark glassmorphic login with 1-click demo presets | Live stat cards + Chart.js analytics | Searchable student table with inline edit |
-
-| Marks & Marksheet | Attendance Log | Approvals Panel |
-|---|---|---|
-| Auto-grade + Printable PDF report card | 3-status selector + CSV export | Bulk Approve All / Clear All |
-
----
-
-## 🌟 Key Features
-
-### 🔐 Authentication & Security
-- **JWT (JSON Web Token)** stateless session management
-- **BCrypt.js** salted password hashing (10 salt rounds)
-- **Role-Based Access Control (RBAC)**: Distinct permissions for `ADMIN`, `TEACHER`, and `STUDENT`
-- **Protected Client Routes**: Automatic redirect & unauthorized access prevention
-- **1-Click Recruiter Demo Login**: Instant login pre-sets for Admin, Faculty, and Student roles
-- **Password Visibility Toggle**: Eye/EyeOff toggle on Login & Register pages
-
-### 📊 Dashboard & Analytics
-- Real-time stat summary cards (Total Students, Attendance Rate, Average Marks, Pending Requests)
-- **Chart.js Visualizations**: Interactive Doughnut chart for Attendance breakdown & Bar chart for Subject Performance
-- **Smart Empty States**: No misleading fallback charts when no data is recorded yet
-
-### 👥 Student Directory
-- Manage student records: First/Last Name, Enrollment Date, Phone, Address, Date of Birth
-- Unlinked account badges & user account linking
-- Instant real-time search filter by name or email
-- CSV export of student records
-
-### 📅 Attendance Log
-- Daily attendance marking: `PRESENT` / `ABSENT` / `LATE`
-- Visual 3-button inline status selector
-- Per-record Edit & Delete support
-- Faculty submission → Admin approval pipeline
-- **CSV Data Export** functionality
-
-### 📚 Academic Marks & Marksheet
-- Subject-wise score management (`marksObtained` / `totalMarks`)
-- Auto-calculated letter grades: `O`, `A+`, `A`, `B+`, `B`, `C`, `D`, `F`
-- Inline percentage progress bars per subject
-- **Printable Report Cards**: High-resolution printable marksheet with PDF save support via `window.print()`
-- Subject-based filter dropdown & keyword search
-
-### 📋 Pending Approvals Workflow (Admin Only)
-- Separate approval queues for Attendance Requests and Marks Requests
-- Single-click **✓ Approve All** (all pending items approved in bulk)
-- Single-click **✗ Clear All** (all pending items rejected in bulk)
-- Individual approval/rejection per record
-
-### 🔔 Notifications
-- Header notification bell with live unread badge counter (auto-refreshes every 30 seconds)
-- **Read All** single-click clears all unread notifications
-- Per-notification mark-as-read action
-
-### 🧑‍💼 Profile Management
-- User account overview card with gradient avatar, role badge, and account status
-- Inline Edit Profile modal (username + email update)
-- Secure session info display
-
-### 📝 Create Account (Multi-Step Registration)
-- **Step 1**: Username, Email, Password with real-time 4-bar strength meter
-- **Step 2**: Visual role card selector (Student 🟢 / Faculty 🟣 / Admin 🔵)
-- Step progress indicator with animated transitions
+- 🔐 **Secure Role-Based Authentication**: JWT-based session management with bcrypt password encryption.
+- 👥 **Multi-Role Dashboards**: Tailored views and permissions for Students, Faculty (Teachers), and Administrators.
+- 📋 **Student Information Management**: Complete student profiles linked with user accounts.
+- 📅 **Attendance Tracking & Approvals**: Faculty mark attendance, with admin approval workflows.
+- 📊 **Marks & Auto-Grade Calculation**: Automatic calculation of letter grades (O, A+, A, B+, B, C, D, F) based on subject performance.
+- 🔔 **Real-Time System Notifications**: Instant notifications for pending approvals, registration events, and grade updates.
+- ⚡ **Centralized Administrative Controls**: One-click bulk approval or rejection for pending attendance and marks submissions.
+- 📱 **Responsive Dark-Themed Dashboard**: Interactive visualization using Chart.js, statistics cards, and responsive tables.
 
 ---
 
-## 🛠️ Technology Stack
+## 3. User Roles
 
-| Layer | Technology |
-|---|---|
-| **Frontend Core** | React 19, Vite 8, JavaScript (ES6+) |
-| **Routing** | React Router DOM v7 |
-| **HTTP Client** | Axios (auto-injecting JWT Bearer token) |
-| **Styling** | TailwindCSS v4, Custom CSS Design System |
-| **UI Fonts** | Google Fonts: `Inter`, `Plus Jakarta Sans` |
-| **Icons** | Lucide React |
-| **Charts** | Chart.js, `react-chartjs-2` |
-| **Notifications** | React Hot Toast |
-| **Backend Runtime** | Node.js (v18+) |
-| **Backend Framework** | Express.js |
-| **Database** | MySQL 8.0 |
-| **DB Driver** | `mysql2/promise` (async connection pooling) |
-| **Auto Seeder** | Custom `initDb.js` (creates schema + demo accounts) |
-| **Authentication** | `jsonwebtoken`, `bcryptjs` |
-| **Security** | `cors`, role-based middleware guards |
-| **Dev Tooling** | `nodemon` (backend), Vite HMR (frontend) |
+### 🎓 Student (`STUDENT` / `ROLE_STUDENT`)
+- View personal academic profile, enrollment details, and assigned user account.
+- Check personal attendance history and approved status.
+- View approved subject marks and automatically computed letter grades.
+- Receive personal notifications regarding attendance or mark approvals.
+
+### 👩‍🏫 Faculty (`TEACHER` / `ROLE_TEACHER`)
+- View complete student directory and unassigned student accounts.
+- Create new student profiles and update profile details.
+- Record and update student attendance (submitted for administrative approval).
+- Input and update student marks and total scores (submitted for administrative approval).
+- Delete attendance or mark records if necessary.
+
+### 🛡️ Admin (`ADMIN` / `ROLE_ADMIN`)
+- Full system access across all modules.
+- Create, update, and delete student records.
+- Approve or reject individual or bulk attendance and marks submissions.
+- Receive administrative notifications for new registrations and pending submissions.
+- Manage user-to-student profile linkages.
 
 ---
 
-## 🏗️ Project Architecture
+## 4. Technology Stack
 
-```
-Student Management Portal/
-├── README.md                     # ← You are here
-├── .gitignore
-│
-├── smartedu-backend/             # Node.js + Express.js + MySQL REST API
-│   ├── config/
-│   │   ├── db.js                 # mysql2 connection pool
-│   │   └── initDb.js             # Auto schema creation + demo account seeder
-│   ├── controllers/              # Request handlers
-│   │   ├── authController.js
-│   │   ├── studentController.js
-│   │   ├── attendanceController.js
-│   │   ├── marksController.js
-│   │   ├── approvalController.js
-│   │   ├── notificationController.js
-│   │   └── userController.js
-│   ├── middleware/
-│   │   ├── authMiddleware.js     # JWT verification
-│   │   ├── roleMiddleware.js     # RBAC role guard
-│   │   └── errorMiddleware.js
-│   ├── routes/                   # Express route definitions
-│   ├── services/                 # SQL logic layer
-│   ├── utils/
-│   │   └── jwt.js                # Token helpers
-│   ├── schema.sql                # Database DDL
-│   ├── server.js                 # Express entry point (Port 9999)
-│   └── package.json
-│
-└── smartedu-frontend/            # React 19 + Vite SPA
-    ├── src/
-    │   ├── components/
-    │   │   ├── Layout.jsx
-    │   │   ├── Sidebar.jsx
-    │   │   ├── Navbar.jsx
-    │   │   └── NotificationDropdown.jsx
-    │   ├── context/
-    │   │   └── AuthContext.jsx   # Global auth state + JWT storage
-    │   ├── pages/
-    │   │   ├── Login.jsx
-    │   │   ├── Register.jsx
-    │   │   ├── Dashboard.jsx
-    │   │   ├── Students.jsx
-    │   │   ├── Attendance.jsx
-    │   │   ├── Marks.jsx
-    │   │   ├── Approvals.jsx
-    │   │   └── Profile.jsx
-    │   ├── services/
-    │   │   └── api.js            # Axios instance with JWT interceptor
-    │   └── index.css             # Custom design tokens & utilities
-    ├── index.html
-    ├── vite.config.js
-    └── package.json
+- **Frontend**: React.js, JavaScript (ES6+), Vite, Tailwind CSS, Lucide React, Chart.js, React Router DOM
+- **Backend**: Node.js, Express.js
+- **Database**: MySQL (using `mysql2/promise` connection pooling)
+- **Authentication**: JSON Web Tokens (`jsonwebtoken`)
+- **Security**: Password hashing with `bcryptjs`, CORS middleware, Parameterized SQL queries
+- **Deployment**: Vercel (Frontend), Render (Backend), Railway (Managed MySQL Database)
+
+---
+
+## 5. System Architecture
+
+```mermaid
+graph TD
+    A["React Frontend (Vercel)"] -->|HTTPS / REST API| B["Node.js + Express Backend (Render)"]
+    B -->|JWT Verification & Middleware| C["Controllers & Services"]
+    C -->|mysql2 Parameterized Queries| D[("MySQL Database (Railway)")]
 ```
 
 ---
 
-## 🚦 Getting Started
+## 6. Main Functionalities
 
-### ✅ Prerequisites
-- **Node.js** v18.0.0 or higher → [Download](https://nodejs.org)
-- **MySQL Server** v8.0 or higher → [Download](https://dev.mysql.com/downloads/)
-- **Git** → [Download](https://git-scm.com/)
+1. **Authentication**: Secure user login (`/api/auth/signin`) and registration (`/api/auth/signup`) returning JWT bearer tokens.
+2. **Registration**: Self-service user signup with role assignment (Student, Teacher, Admin).
+3. **Student Management**: Full CRUD lifecycle for student profiles, linking user credentials with academic records.
+4. **Attendance Management**: Daily attendance tracking (Present, Absent, Late) with state transition tracking (Pending $\rightarrow$ Approved/Rejected).
+5. **Marks Management**: Subject-wise mark recording with automated letter grade evaluation.
+6. **Notifications**: Role-based and user-specific event notifications stored in MySQL.
+7. **Approval Workflows**: Administrative review queue with one-click bulk approval/rejection capability.
+8. **Role-Based Access Control (RBAC)**: Strict route protection enforced by custom Express middleware (`requireAuth`, `requireRole`).
+9. **CRUD Operations**: Complete Create, Read, Update, and Delete operations across all domain entities.
 
 ---
 
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/ankittech68/smartedu-student-managementt.git
-cd smartedu-student-managementt
+## 7. Project Structure
+
+```
+SmartEdu Student Management Portal/
+├── smartedu-frontend/              # React.js Vite Frontend Application
+│   ├── public/                    # Static assets & icons
+│   ├── src/
+│   │   ├── assets/                # Logos, SVG icons, imagery
+│   │   ├── components/            # Reusable UI components (Navbar, Sidebar, Layout, Notifications)
+│   │   ├── context/               # React Context (AuthContext, ThemeContext)
+│   │   ├── pages/                 # Route pages (Dashboard, Login, Register, Students, Attendance, Marks, Approvals, Profile)
+│   │   ├── services/              # Axios instance configuration (api.js)
+│   │   ├── App.jsx                # Application root with router configuration
+│   │   ├── index.css              # Custom CSS & design system tokens
+│   │   └── main.jsx               # Entry point
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── vercel.json
+│   └── .env.example
+├── smartedu-backend/               # Express.js Node.js Backend API
+│   ├── config/                    # DB connection pool (db.js) & schema initializer (initDb.js)
+│   ├── controllers/               # Controller request handlers
+│   ├── middleware/                # JWT Auth, Role validation & centralized Error middleware
+│   ├── routes/                    # Express Router definitions
+│   ├── services/                  # Business logic & SQL execution layers
+│   ├── utils/                     # JWT helper utilities
+│   ├── Dockerfile                 # Optional container deployment file
+│   ├── package.json
+│   ├── render.json                # Render deployment configuration schema
+│   ├── schema.sql                 # MySQL schema definitions
+│   ├── server.js                  # Express application entry point
+│   └── .env.example
+├── README.md                      # Project documentation
+├── vercel.json                    # Monorepo deployment settings
+└── .gitignore
 ```
 
 ---
 
-### Step 2: Database Setup
-Open MySQL and create the database:
-```sql
-CREATE DATABASE smartedu;
-```
-> 💡 The `initDb.js` seeder will **automatically create all tables** and insert demo accounts when the backend starts for the first time.
+## 8. API Overview
+
+### 🔑 Authentication
+| Method | Endpoint | Auth Required | Allowed Roles | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `POST` | `/api/auth/signin` | ❌ No | Public | Authenticate user credentials & return JWT |
+| `POST` | `/api/auth/signup` | ❌ No | Public | Register new user account |
+
+### 👥 Users & Profiles
+| Method | Endpoint | Auth Required | Allowed Roles | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `GET` | `/api/users/students/unassigned` | ✅ Yes | Admin, Teacher | Fetch users with STUDENT role lacking profile |
+| `PUT` | `/api/users/:id` | ✅ Yes | Admin, Teacher, Student | Update user profile credentials |
+
+### 🎓 Students
+| Method | Endpoint | Auth Required | Allowed Roles | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `POST` | `/api/students` | ✅ Yes | Admin, Teacher | Create a new student record |
+| `GET` | `/api/students` | ✅ Yes | Admin, Teacher | Retrieve all student records |
+| `GET` | `/api/students/me` | ✅ Yes | Student | Retrieve logged-in student profile |
+| `GET` | `/api/students/user/:userId` | ✅ Yes | Admin, Teacher, Student | Retrieve student by user ID |
+| `GET` | `/api/students/:id` | ✅ Yes | Admin, Teacher | Retrieve student record by ID |
+| `PUT` | `/api/students/:id` | ✅ Yes | Admin, Teacher | Update student record |
+| `DELETE` | `/api/students/:id` | ✅ Yes | Admin | Delete student record |
+
+### 📅 Attendance
+| Method | Endpoint | Auth Required | Allowed Roles | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `POST` | `/api/attendance` | ✅ Yes | Admin, Teacher | Record student attendance |
+| `GET` | `/api/attendance` | ✅ Yes | Admin, Teacher | Fetch all attendance records |
+| `GET` | `/api/attendance/student/:studentId` | ✅ Yes | Admin, Teacher, Student | Fetch attendance for specific student |
+| `PUT` | `/api/attendance/:id` | ✅ Yes | Admin, Teacher | Update attendance record |
+| `PUT` | `/api/attendance/:id/approve` | ✅ Yes | Admin | Approve attendance submission |
+| `PUT` | `/api/attendance/:id/reject` | ✅ Yes | Admin | Reject attendance submission |
+| `DELETE` | `/api/attendance/:id` | ✅ Yes | Admin, Teacher | Delete attendance record |
+
+### 📝 Marks
+| Method | Endpoint | Auth Required | Allowed Roles | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `POST` | `/api/marks` | ✅ Yes | Admin, Teacher | Enter student marks & auto-compute grade |
+| `GET` | `/api/marks` | ✅ Yes | Admin, Teacher | Fetch all marks records |
+| `GET` | `/api/marks/student/:studentId` | ✅ Yes | Admin, Teacher, Student | Fetch marks for specific student |
+| `PUT` | `/api/marks/:id` | ✅ Yes | Admin, Teacher | Update marks record |
+| `PUT` | `/api/marks/:id/approve` | ✅ Yes | Admin | Approve marks submission |
+| `PUT` | `/api/marks/:id/reject` | ✅ Yes | Admin | Reject marks submission |
+| `DELETE` | `/api/marks/:id` | ✅ Yes | Admin, Teacher | Delete marks record |
+
+### 🔔 Notifications & Approvals
+| Method | Endpoint | Auth Required | Allowed Roles | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `GET` | `/api/notifications` | ✅ Yes | All Authenticated | Fetch notifications for logged-in user |
+| `PUT` | `/api/notifications/:id/read` | ✅ Yes | All Authenticated | Mark notification as read |
+| `PUT` | `/api/notifications/read-all` | ✅ Yes | All Authenticated | Mark all user notifications as read |
+| `GET` | `/api/approvals/pending` | ✅ Yes | Admin | Get list of pending attendance and marks |
+| `PUT` | `/api/approvals/approve-all` | ✅ Yes | Admin | Approve all pending requests in queue |
+| `PUT` | `/api/approvals/reject-all` | ✅ Yes | Admin | Reject all pending requests in queue |
+| `GET` | `/api/health` | ❌ No | Public | Health check endpoint for deployment monitoring |
 
 ---
 
-### Step 3: Backend Setup
-```bash
-cd smartedu-backend
-npm install
-```
+## 9. Database Schema
 
-Create a `.env` file inside `smartedu-backend/`:
+The database consists of 5 relational MySQL tables:
+
+1. **`users`**: Stores user authentication credentials, email addresses, and system roles (`ADMIN`, `TEACHER`, `STUDENT`).
+2. **`students`**: Stores student biographical details (name, DOB, enrollment date, phone, address) with foreign key linkage to `users.id`.
+3. **`attendance`**: Records date-wise attendance status (`PRESENT`, `ABSENT`, `LATE`) and approval state (`PENDING`, `APPROVED`, `REJECTED`).
+4. **`marks`**: Stores subject-wise marks, total marks, calculated letter grades, and approval status.
+5. **`notifications`**: Stores real-time user notification messages, timestamps, and read state.
+
+---
+
+## 10. Environment Variables
+
+### Backend Configuration (`smartedu-backend/.env`)
 ```env
-PORT=9999
+NODE_ENV=development
+PORT=5000
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=smartedu
-JWT_SECRET=your_super_secret_jwt_key_here
+JWT_SECRET=your_super_secret_jwt_key
+JWT_EXPIRES_IN=24h
+FRONTEND_URL=http://localhost:5173
 ```
 
-Start the development server:
-```bash
-npm run dev
+### Frontend Configuration (`smartedu-frontend/.env`)
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
-> ✅ Server runs on `http://localhost:9999`. Tables and demo accounts are created automatically.
 
 ---
 
-### Step 4: Frontend Setup
-```bash
-cd ../smartedu-frontend
-npm install
-npm run dev
-```
-> ✅ App runs on `http://localhost:5173`
+## 11. Local Installation
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm
+- MySQL Server (v8.0 or higher)
+
+### Setup Steps
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/ankittech68/smartedu-student-managementt.git
+   cd smartedu-student-managementt
+   ```
+
+2. **Install Backend Dependencies**:
+   ```bash
+   cd smartedu-backend
+   npm install
+   ```
+
+3. **Install Frontend Dependencies**:
+   ```bash
+   cd ../smartedu-frontend
+   npm install
+   ```
+
+4. **Configure Environment Variables**:
+   - Copy `.env.example` to `.env` in `smartedu-backend/` and configure your local MySQL credentials.
+   - Copy `.env.example` to `.env` in `smartedu-frontend/` and set `VITE_API_URL=http://localhost:5000/api`.
 
 ---
 
-## 🔑 Recruiter Demo Accounts
+## 12. Running the Application
 
-| Role | Username | Password | Access Level |
-|---|---|---|---|
-| **🔴 Administrator** | `admin` | `admin123` | Full access: All modules, Approvals, User management |
-| **🟣 Faculty Member** | `teacher` | `teacher123` | Add/Edit: Attendance & Marks, View Students |
-| **🟢 Student** | `student` | `student123` | View Only: Own Attendance, Marks, Profile |
+1. **Start the Backend Server**:
+   ```bash
+   cd smartedu-backend
+   npm run dev
+   ```
+   *(The server initializes database tables and seeds demo accounts automatically upon startup on `http://localhost:5000`)*.
 
-> 💡 These credentials are pre-loaded on backend startup by `initDb.js`.
-
----
-
-## 🔌 REST API Overview
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/auth/login` | ❌ | User login → returns JWT |
-| `POST` | `/api/auth/register` | ❌ | Register new account |
-| `GET` | `/api/students` | ✅ | Get all students |
-| `POST` | `/api/students` | ✅ ADMIN/TEACHER | Add new student |
-| `PUT` | `/api/students/:id` | ✅ ADMIN/TEACHER | Update student |
-| `DELETE` | `/api/students/:id` | ✅ ADMIN | Delete student |
-| `GET` | `/api/attendance` | ✅ | Get attendance records |
-| `POST` | `/api/attendance` | ✅ ADMIN/TEACHER | Mark attendance |
-| `PUT` | `/api/attendance/:id/approve` | ✅ ADMIN | Approve attendance |
-| `GET` | `/api/marks` | ✅ | Get marks records |
-| `POST` | `/api/marks` | ✅ ADMIN/TEACHER | Add subject marks |
-| `PUT` | `/api/marks/:id/approve` | ✅ ADMIN | Approve marks |
-| `GET` | `/api/approvals/pending` | ✅ ADMIN | Get all pending requests |
-| `PUT` | `/api/approvals/approve-all` | ✅ ADMIN | Bulk approve all |
-| `PUT` | `/api/approvals/reject-all` | ✅ ADMIN | Bulk clear all |
-| `GET` | `/api/notifications` | ✅ | Get user notifications |
-| `PUT` | `/api/notifications/read-all` | ✅ | Mark all as read |
+2. **Start the Frontend Application**:
+   ```bash
+   cd smartedu-frontend
+   npm run dev
+   ```
+   *(Open `http://localhost:5173` in your web browser)*.
 
 ---
 
-## 🎨 UI Design System
+## 13. Production Deployment
 
-The frontend features a premium custom design system built on TailwindCSS:
+### Live Architecture
+- **Frontend**: Deployed on **Vercel** (`https://smartedu-student-managementt.vercel.app`)
+- **Backend**: Deployed on **Render** (`https://smartedu-student-managementt.onrender.com`)
+- **Database**: Cloud MySQL hosted on **Railway**
 
-- **Dark Sidebar** (`slate-950`) with gradient SmartEdu branding
-- **Glassmorphic Cards** with `backdrop-filter: blur` and subtle border highlights
-- **Custom Utility Classes**: `.glass-card`, `.glass-input`, `.btn-primary`, `.btn-secondary`, `.badge`, `.modal-overlay`
-- **Consistent Badge System**: Role & status badges (indigo, emerald, amber, rose, purple variants)
-- **Smooth Micro-animations**: `animate-fade-in-up` page transitions, button hover lifts, modal slide-in
-- **Typography**: Google Fonts `Inter` (body) + `Plus Jakarta Sans` (headings)
-- **Color Palette**: Indigo/Violet gradient brand, semantic status colors across all components
+### Production Environment Variables
+
+#### Render (Backend) Settings:
+- `NODE_ENV` = `production`
+- `PORT` = *(Dynamically assigned by Render)*
+- `DB_HOST` = *(Railway MySQL proxy host)*
+- `DB_PORT` = *(Railway MySQL proxy port)*
+- `DB_USER` = *(Railway MySQL user)*
+- `DB_PASSWORD` = *(Railway MySQL password)*
+- `DB_NAME` = `railway` (or `smartedu`)
+- `JWT_SECRET` = *(Generated secure production key)*
+- `JWT_EXPIRES_IN` = `24h`
+- `FRONTEND_URL` = `https://smartedu-student-managementt.vercel.app`
+
+#### Vercel (Frontend) Settings:
+- `VITE_API_URL` = `https://smartedu-student-managementt.onrender.com/api`
 
 ---
 
-## 👤 Author
+## 14. Security Features
 
-**Ankit** — [@ankittech68](https://github.com/ankittech68)
+- 🔑 **Password Hashing**: Industry-standard password hashing using `bcryptjs` (salt rounds: 10).
+- 🛡️ **JWT Authentication**: Stateless authentication utilizing signed JSON Web Tokens passed in Authorization headers.
+- 💉 **SQL Injection Defense**: Prepared parameterized queries (`?` placeholders) executed via `mysql2/promise`.
+- 🌐 **Configured CORS**: Strict origin whitelisting guaranteeing that cross-origin API calls are only permitted from verified frontend domains.
+- 🔒 **Role-Based Access Control**: Declarative Express middleware ensuring endpoints are strictly restricted to authorized user roles.
+- 🛡️ **Environment Variable Isolation**: Sensitive secrets and DB credentials excluded from repository commits using git rules.
 
 ---
 
-## 📄 License
+## 15. Future Improvements
 
-This project is open source and available under the [MIT License](LICENSE).
+- 📄 PDF export functionality for student report cards and attendance transcripts.
+- 📧 Automated email notification alerts for password recovery and approval notices.
+- 📊 Advanced analytics reporting for term-wise GPA progression.
 
 ---
 
-<div align="center">
-  <strong>⭐ Star this repo if it helped you! ⭐</strong>
-</div>
+## 16. Author
+
+**Ankit**
+- GitHub: [@ankittech68](https://github.com/ankittech68)

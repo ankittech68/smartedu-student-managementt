@@ -1,29 +1,29 @@
 # ─── Node Modules and Production Builds ──────────────────────────────────────
-smartedu-frontend/node_modules/
-smartedu-frontend/dist/
-smartedu-backend/node_modules/
 node_modules/
+smartedu-frontend/node_modules/
+smartedu-backend/node_modules/
 dist/
+build/
+coverage/
+smartedu-frontend/dist/
 
-# ─── Local Environment Variables and Secrets ─────────────────────────────────
-# Backend
+# ─── Environment Variables and Secrets ──────────────────────────────────────
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 smartedu-backend/.env
-smartedu-backend/.env.local
-
-# Frontend
+smartedu-backend/.env.*
+!smartedu-backend/.env.example
 smartedu-frontend/.env
-smartedu-frontend/.env.local
-smartedu-frontend/.env.production
-smartedu-frontend/.env.*.local
+smartedu-frontend/.env.*
+!smartedu-frontend/.env.example
 
 # ─── Logs and Temporary Files ─────────────────────────────────────────────────
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
+pnpm-debug.log*
 
 # ─── Editor Directories ───────────────────────────────────────────────────────
 .vscode/
@@ -31,7 +31,7 @@ yarn-debug.log*
 .DS_Store
 Thumbs.db
 
-# ─── Java / Spring Boot Artifacts (legacy — removed) ─────────────────────────
+# ─── Java / Legacy Artifacts ──────────────────────────────────────────────────
 target/
 *.class
 *.jar
